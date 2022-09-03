@@ -6,6 +6,7 @@ const saltRounds = 10;
 const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
 const { strictEqual } = require('assert');
+const { error } = require('console');
 dotenv.config();
 process.env.TOKEN_SECRET;
 
@@ -111,47 +112,45 @@ module.exports.login = async (request, response) => {
         }
 
         bcrypt.compare(password, addData.data[0].password, function (err, result) {
-
-
-            if (result) {
-
-                const token = generateAccessToken({ email: request.body.email });
-                function authenticateToken(request, response, next) {
-                    const authHeader = request.headers['authorization']
-                    const token = authHeader && authHeader.split(' ')[1]
-
-                    if (token == null) {
-                        return response.json({
-                            status: false,
-                            message: "Token is null",
-                            data: null
-                        })
-                    }
-
-                    jwt.verify(token, process.env.TOKEN_SECRET, (err, result) => {
-                        if (err) {
-                            return response.json({
-                                status: false,
-                                message: "Token Not Verify",
-                                data: null
-                            })
-                        }
-                        request.email = email
-                        next()
-                    })
-                }
-                return response.json({
-                    status: true,
-                    message: "Login Successfully & Token Generated",
-                    data: addData, token, email
-                });
-            } else {
+            if (err) {
                 return response.json({
                     status: false,
                     message: "Login unsuccessfully",
                     data: null
                 });
 
+            }
+            if (result) {
+                // const token = generateAccessToken({ email: request.body.email });
+                // function authenticateToken(request, response, next) {
+                //     const authHeader = request.headers['authorization']
+                //     const token = authHeader && authHeader.split(' ')[1]
+
+                //     if (token == null) {
+                //         return response.json({
+                //             status: false,
+                //             message: "Token is null",
+                //             data: null
+                //         })
+                //     }
+
+                // jwt.verify(token, process.env.TOKEN_SECRET, (err, result) => {
+                //     if (err) {
+                //         return response.json({
+                //             status: false,
+                //             message: "Token Not Verify",
+                //             data: null
+                //         })
+                //     }
+                //     request.email = email
+                //     next()
+                // })
+                // }
+                return response.json({
+                    status: true,
+                    message: "Login Successfully & Token Generated",
+                    data: addData, token, email
+                });
             }
         })
 
@@ -169,9 +168,10 @@ module.exports.login = async (request, response) => {
 
 module.exports.varifiy = async (request, response) => {
     try {
-        const { otp } = request.body;
+        const { email, otp } = request.body;
 
         const txData = {
+            email: email,
             otp: otp
         };
 
@@ -187,14 +187,14 @@ module.exports.varifiy = async (request, response) => {
             return response.json({
                 status: true,
                 message: "otp varified",
-                data: txData
+                data: addData
             });
         }
     } catch (e) {
         return response.json({
             status: true,
             message: "otp not sure",
-            data: txData
+            data: addData
         })
     }
 }

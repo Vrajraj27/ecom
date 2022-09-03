@@ -113,27 +113,28 @@ module.exports.login = async (txData) => {
                         return resolve({
                             status: true,
                             message: "login successfully",
-                            data: data.password
+                            data: txData.password
                         })
                     }
                 })
             }
-            return resolve({
-                status: true,
-                message: "User inserted not found",
-                data: []
-            })
+            // return resolve({
+            //     status: true,
+            //     message: "User inserted not found",
+            //     data: []
+            // })
         })
     })
 }
 
 
-module.exports.varifiy = async (data) => {
+module.exports.varifiy = async (txData) => {
     return new Promise((resolve, rejects) => {
-        var sql = 'SELECT * FROM register WHERE otp = "' + data.otp + '"'
+        var sql = 'SELECT email ,otp FROM register WHERE otp = "' + txData.otp + '"'
         console.log('sql: ', sql);
-        // console.log('sql: ', sql);
-        con.query(sql, [data], (error, results) => {
+        con.query(sql, (error, results) => {
+            console.log('results: ', results);
+
             if (error) {
                 return resolve({
                     status: false,
@@ -142,11 +143,32 @@ module.exports.varifiy = async (data) => {
                 })
             };
             if (results) {
-                return resolve({
-                    status: true,
-                    message: "Otp varified",
-                    data: results
-                })
+                console.log('results[0].email: ', results[0].email);
+                console.log('txData.email: ', txData.email);
+
+                if (results[0].email == txData.email) {
+
+                    var sql1 = "UPDATE register SET varify = 'done' WHERE email = '" + results[0].email + "'";
+                    console.log('sql1: ', sql1);
+                    con.query(sql1, (error, results) => {
+                        console.log('error: ', error);
+                        if (error) {
+                            return resolve({
+                                status: false,
+                                message: "otp not varify",
+                                data: null
+                            })
+                        }
+                        if (results) {
+                            return resolve({
+                                status: true,
+                                message: "otp varify",
+                                data: null
+                            })
+                        }
+                    })
+                }
+
             }
             // else {
             //     return resolve({
