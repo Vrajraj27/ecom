@@ -29,7 +29,7 @@ app.use(function (err, req, res, next) {
     res.json({ success: false, message: '500 Server Error', data: err.stack });
     next(err);
 });
-let PORT = process.env.PORT || 3000;
+let PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
     console.log('Server is up and running on ${PORT} ...');
 })
