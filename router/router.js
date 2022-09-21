@@ -38,7 +38,7 @@ router.post("/admin/register", admin.register);
 router.post("/admin/login", validator.adminlogin, admin.adminLogin);
 
 // search
-router.get("/profile", validator.token, controller.profile);
+router.get("/profile", controller.profile);
 // Admin side user control
 router.get("/admin/getprofiles", validator.page, validator.token, admin.getProfiles);
 router.delete("/admin/deleteuser", validator.delUser, validator.token, admin.deleteUser);
